@@ -3,6 +3,8 @@
 把厚书读薄，把精华听进心里。
 
 一款极简的书籍蒸馏阅读器：AI 将原版书籍蒸馏为结构化 HTML，本地阅读 + 语音朗读。
+<img width="1600" height="975" alt="QQ截图20260927211116" src="https://github.com/user-attachments/assets/452277c5-ea65-48a3-b6df-b0ddec32cfcd" />
+<img width="1600" height="975" alt="QQ截图20260927211109" src="https://github.com/user-attachments/assets/d03c6afa-d5fd-4220-acf9-bf29f22b1368" />
 
 ## 项目结构
 
