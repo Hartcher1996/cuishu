@@ -11,6 +11,7 @@ desktop/books.zip
 # === Wails runtime data ===
 desktop/build/bin/*.json
 desktop/build/bin/books/
+desktop/build/windows/installer/tmp/
 
 # === Logs ===
 *.log

@@ -30,6 +30,7 @@ const emit = defineEmits<{
 }>()
 
 const FONT_OPTIONS = [
+  { value: 'fzsongsong', label: '方正书宋', family: "'FZShuSong', 'Noto Serif SC', Georgia, serif" },
   { value: 'noto-serif-sc', label: '思源宋体', family: "'Noto Serif SC', Georgia, serif" },
   { value: 'noto-sans-sc', label: '思源黑体', family: "'Noto Sans SC', 'PingFang SC', sans-serif" },
   { value: 'harmonyos-sans', label: '鸿蒙字体', family: "'HarmonyOS Sans', 'PingFang SC', sans-serif" },

@@ -28,6 +28,7 @@ const containerRef = ref<HTMLDivElement | null>(null)
 const contextMenuRef = ref<InstanceType<typeof ContextMenu> | null>(null)
 
 const FONT_FAMILY_MAP: Record<string, string> = {
+  'fzsongsong': "'FZShuSong', 'Noto Serif SC', Georgia, serif",
   'noto-serif-sc': "'Noto Serif SC', Georgia, serif",
   'noto-sans-sc': "'Noto Sans SC', 'PingFang SC', sans-serif",
   'harmonyos-sans': "'HarmonyOS Sans', 'PingFang SC', sans-serif",

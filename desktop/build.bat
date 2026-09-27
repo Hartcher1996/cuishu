@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-REM === Cuishu Desktop - Build / Release Script ===
+REM Build script for Cuishu desktop
 REM Usage:
 REM   build.bat          - build exe only
 REM   build.bat release  - build exe + NSIS installer
@@ -25,6 +25,6 @@ if errorlevel 1 ( echo BUILD FAILED & pause & exit /b 1 )
 
 echo.
 echo [3/3] Done!
-echo exe:        build\bin\萃书.exe
-if "%1"=="release" echo installer:  build\bin\萃书-amd64-installer.exe
+echo exe: build\bin\萃书.exe
+if "%1"=="release" echo installer: build\bin\萃书-amd64-installer.exe
 pause
