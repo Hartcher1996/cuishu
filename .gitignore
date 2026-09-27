@@ -1,0 +1,33 @@
+# === Dependencies ===
+node_modules/
+
+# === Build outputs ===
+**/dist/
+desktop/build/bin/
+desktop/app.exe
+desktop/wails
+desktop/books.zip
+
+# === Wails runtime data ===
+desktop/build/bin/*.json
+desktop/build/bin/books/
+
+# === Logs ===
+*.log
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === Temp ===
+*.tmp
+*.bak
+
+# Wails generated
+package.json.md5

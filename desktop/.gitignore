@@ -1,0 +1,12 @@
+build/bin
+node_modules
+frontend/dist
+
+# 运行时数据（wails dev 自动生成）
+build/bin/*.json
+build/bin/books/
+
+# 项目根编译/临时产物
+app.exe
+wails
+books.zip

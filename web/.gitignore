@@ -1,0 +1,4 @@
+node_modules
+dist
+public/books-manifest.json
+.DS_Store

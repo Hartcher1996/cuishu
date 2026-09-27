@@ -1,0 +1,95 @@
+/* === 字体 === */
+@font-face {
+  font-family: 'Noto Serif SC';
+  src: url('./assets/fonts/noto-serif-sc-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  src: url('./assets/fonts/noto-sans-sc-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HarmonyOS Sans';
+  src: url('./assets/fonts/harmonyos-sans-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LXGW WenKai';
+  src: url('./assets/fonts/lxgw-wenkai-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === 视觉令牌 === */
+:root {
+  --primary: #c0392b;
+  --primary-light: #e74c3c;
+  --primary-dark: #922b21;
+  --primary-bg: #fdf2f0;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --text: #2c3e50;
+  --text-light: #7f8c8d;
+  --text-lighter: #bdc3c7;
+  --border: #ecf0f1;
+  --border-dark: #dfe6e9;
+  --toc-bg: #fafafa;
+  /* 安全区域（刘海屏 / 底部手势条）*/
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* 移动端断点 */
+  --mobile-breakpoint: 768px;
+}
+
+/* === 深色模式 === */
+:root[data-theme="dark"] {
+  --primary: #e74c3c;
+  --primary-light: #ff6b5e;
+  --primary-dark: #f08080;
+  --primary-bg: #2a1d1b;
+  --bg: #1a1a1a;
+  --surface: #2a2a2a;
+  --text: #e8e8e8;
+  --text-light: #a8a8a8;
+  --text-lighter: #707070;
+  --border: #2e2e2e;
+  --border-dark: #3a3a3a;
+  --toc-bg: #232323;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  /* 移动端：禁止双击缩放、去除点击高亮、禁止下拉刷新 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* 100dvh 修复 iOS Safari 地址栏伸缩问题，100vh 作为 fallback */
+#app { height: 100vh; height: 100dvh; }
+
+h1, h2, h3, h4 {
+  font-family: Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+  font-weight: 600;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
