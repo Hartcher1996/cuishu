@@ -2,8 +2,8 @@
 
 把厚书读薄，把精华听进心里。
 
-一款极简的书籍蒸馏阅读器：AI 将原版书籍蒸馏为结构化 HTML，本地阅读 + 语音朗读。
-<img width="1600" height="975" alt="QQ截图20260927211116" src="https://github.com/user-attachments/assets/452277c5-ea65-48a3-b6df-b0ddec32cfcd" />
+一款极简的书籍蒸馏阅读器：AI 将原版书籍蒸馏为结构化 HTML，本地阅读 + 语音朗读。  
+<img width="1600" height="975" alt="QQ截图20260927211116" src="https://github.com/user-attachments/assets/452277c5-ea65-48a3-b6df-b0ddec32cfcd" />  
 <img width="1600" height="975" alt="QQ截图20260927211109" src="https://github.com/user-attachments/assets/d03c6afa-d5fd-4220-acf9-bf29f22b1368" />
 
 ## 项目结构
@@ -17,12 +17,12 @@ cuishu/
 
 ## 两个版本
 
-| | 桌面端 `desktop/` | 网页端 `web/` |
-|---|---|---|
-| 技术栈 | Wails v2 + Vue 3 + Go | Vue 3 + Vite |
-| 语音引擎 | edge-tts + Windows 系统语音 | Web Speech API |
-| 书库来源 | 本地 `build/bin/books/` | `public/books/` |
-| 字体 | 思源宋体/黑体、鸿蒙、霞鹜文楷（打包） | 同左 |
+|      | 桌面端 `desktop/`          | 网页端 `web/`      |
+| ---- | ----------------------- | --------------- |
+| 技术栈  | Wails v2 + Vue 3 + Go   | Vue 3 + Vite    |
+| 语音引擎 | edge-tts + Windows 系统语音 | Web Speech API  |
+| 书库来源 | 本地 `build/bin/books/`   | `public/books/` |
+| 字体   | 方正书宋、思源宋/黑、鸿蒙、霞鹜文楷（打包）     | 同左              |
 
 ## 快速开始
 
@@ -68,11 +68,11 @@ npm run build   # 产物在 dist/，可部署到 Cloudflare Pages
 ## 特性
 
 - 📖 本地书库，按分类浏览
-- 🎙️ 双引擎朗读（edge-tts + 系统语音）
-- 🔤 4 种字体切换（思源宋/黑、鸿蒙、霞鹜文楷）
+- 🎙️ 双引擎朗读（edge-tts + 系统语音 / Web Speech API）
+- 🔤 5 种字体切换（方正书宋、思源宋/黑、鸿蒙、霞鹜文楷）
 - 🌗 深色模式
 - ⏱️ 阅读进度自动保存
-- 📱 响应式布局
+- 📱 移动端响应式布局（设置面板弹出式）
 
 ## License
 
