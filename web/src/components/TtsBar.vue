@@ -132,43 +132,34 @@ function onProgressClick(e: MouseEvent) {
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 6v12l8.5-6z"/></svg>
     </button>
 
-    <!-- 移动端展开/收起高级控件 -->
-    <button class="tts-btn adv-toggle" :class="{ active: showAdvanced }" :title="showAdvanced ? '收起设置' : '展开设置'" @click="showAdvanced = !showAdvanced">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-      </svg>
-    </button>
+    <!-- 音量按钮：始终在 TTS Bar 行内 -->
+    <div class="volume-wrap" ref="volumeWrapRef">
+      <button
+        class="tts-btn"
+        :title="`音量 ${volumePct}%`"
+        @click="onVolumeBtnClick"
+      >
+        <svg v-if="volumeIcon === 'mute'" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>
+        <svg v-else-if="volumeIcon === 'low'" viewBox="0 0 24 24" fill="currentColor"><path d="M7 9v6h4l5 5V4l-5 5H7z"/><path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        <svg v-else-if="volumeIcon === 'mid'" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        <svg v-else viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
+      <div v-if="showVolume" class="volume-popup" @mousedown.stop>
+        <div class="volume-val">{{ volumePct }}%</div>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          :value="volume"
+          @input="onVolumeInput"
+          @mouseup="onVolumeSliderMouseUp"
+        />
+      </div>
+    </div>
 
     <!-- 高级控件容器：桌面 display:contents，移动端按需展开 -->
     <div class="adv-wrap" :class="{ 'adv-open': showAdvanced }">
-      <div class="tts-divider"></div>
-
-      <div class="volume-wrap" ref="volumeWrapRef">
-        <button
-          class="tts-btn"
-          :title="`音量 ${volumePct}%`"
-          @click="onVolumeBtnClick"
-        >
-          <svg v-if="volumeIcon === 'mute'" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>
-          <svg v-else-if="volumeIcon === 'low'" viewBox="0 0 24 24" fill="currentColor"><path d="M7 9v6h4l5 5V4l-5 5H7z"/><path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-          <svg v-else-if="volumeIcon === 'mid'" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-          <svg v-else viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-        </button>
-        <div v-if="showVolume" class="volume-popup" @mousedown.stop>
-          <div class="volume-val">{{ volumePct }}%</div>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            :value="volume"
-            @input="onVolumeInput"
-            @mouseup="onVolumeSliderMouseUp"
-          />
-        </div>
-      </div>
-
       <div class="tts-divider"></div>
 
       <div class="tts-control">
@@ -210,6 +201,15 @@ function onProgressClick(e: MouseEvent) {
       <span class="dot"></span>
       <span>{{ statusText }}</span>
     </div>
+
+    <!-- 设置按钮：最右侧 -->
+    <button class="tts-btn adv-toggle" :class="{ active: showAdvanced }" :title="showAdvanced ? '收起设置' : '展开设置'" @click="showAdvanced = !showAdvanced">
+      <svg v-if="showAdvanced" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -232,27 +232,46 @@ function onProgressClick(e: MouseEvent) {
 
 @media (max-width: 768px) {
   .tts-bar {
-    flex-wrap: wrap;
-    height: auto;
-    min-height: 50px;
-    gap: 8px;
-    padding: 6px 10px;
-    padding-bottom: calc(6px + var(--safe-bottom));
+    flex-wrap: nowrap;
+    height: 50px;
+    gap: 6px;
+    padding: 0 10px;
+    padding-bottom: calc(0px + var(--safe-bottom));
+    overflow: visible;
   }
-  .adv-toggle { display: flex; }
+  .adv-toggle {
+    display: flex !important;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
   .adv-toggle.active { color: var(--primary); border-color: var(--primary); background: var(--surface); }
-  .adv-wrap { display: none; width: 100%; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .adv-wrap {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+    z-index: 50;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
   .adv-wrap.adv-open { display: flex; }
-  .tts-btn { width: 32px; height: 32px; flex-shrink: 0; }
+  .tts-btn { width: 30px; height: 30px; flex-shrink: 0; }
   .tts-btn svg { width: 13px; height: 13px; }
-  .tts-btn.primary { width: 36px; height: 36px; }
+  .tts-btn.primary { width: 34px; height: 34px; }
   .tts-btn.primary svg { width: 15px; height: 15px; }
   .tts-divider { display: none; }
-  .tts-control { font-size: 0.76rem; gap: 6px; }
-  .tts-control input[type="range"] { width: 70px; }
-  .tts-control select { font-size: 0.76rem; }
-  .tts-spacer { flex: 1; min-width: 0; }
-  .tts-status { font-size: 0.72rem; }
+  .tts-control { font-size: 0.82rem; gap: 8px; width: 100%; }
+  .tts-control input[type="range"] { flex: 1; max-width: 200px; }
+  .tts-control select { font-size: 0.82rem; flex: 1; }
+  .tts-spacer { display: none; }
+  .tts-status { font-size: 0.72rem; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .volume-popup { bottom: calc(100% + 6px); }
   .volume-popup input[type="range"] { height: 80px; }
 }
