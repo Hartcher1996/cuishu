@@ -175,8 +175,9 @@ function scopeCss(css: string): string {
 
 // 给段落打 data-tts-idx 标记（复用 prepareDoc / queryParagraphNodes / shouldSkipNode）
 function indexParagraphs() {
-  const el = containerRef.value
-  if (!el) return
+  const container = containerRef.value
+  if (!container) return
+  const el = container
   const doc = document // 直接用全局 document
   // 先给容器内所有 .toc / .toc-list / nav 临时标记让 prepareDoc 移除它们
   prepareDoc(doc as any) // prepareDoc 本来就接收 Document
@@ -188,149 +189,112 @@ function indexParagraphs() {
     n.setAttribute('data-tts-idx', String(idx))
     idx++
   })
-  // 右键 → 智能上下文菜单
-  el.addEventListener('contextmenu', (e) => {
-    e.preventDefault()
-    const mx = e.clientX, my = e.clientY
-    const target = (e.target as HTMLElement).closest('[data-tts-idx]') as HTMLElement | null
-    const sel = window.getSelection()
-    const selText = sel && sel.toString().trim().length > 0 ? sel.toString().trim() : ''
-    const idx = target ? parseInt(target.getAttribute('data-tts-idx') || '0', 10) : -1
-    const onPara = idx >= 0
+// 构建上下文菜单（桌面右键 / 移动点击共用）
+function buildContextMenu(target: HTMLElement | null, mx: number, my: number) {
+  const sel = window.getSelection()
+  const selText = sel && sel.toString().trim().length > 0 ? sel.toString().trim() : ''
+  const idx = target ? parseInt(target.getAttribute('data-tts-idx') || '0', 10) : -1
+  const onPara = idx >= 0
 
-    const items: MenuItem[] = []
+  const items: MenuItem[] = []
 
-    if (selText) {
-      // 选中了文字
-      items.push({
-        label: '复制选中文字',
-        icon: 'M9 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z M5 7h2v14a2 2 0 0 0 2 2h6 M16 5h2a2 2 0 0 1 2 2v10',
-        action: () => navigator.clipboard.writeText(selText),
-      })
-      items.push({
-        label: '搜索选中文字',
-        icon: 'M11 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M21 21l-4.35-4.35',
-        action: () => window.open(`https://www.bing.com/search?q=${encodeURIComponent(selText)}`, '_blank'),
-      })
-      items.push({
-        label: '朗读选中文字',
-        icon: 'M3 3v18l9-9 M14 3v18l9-9 M21.44 11.02l-3.2 3.2a3 3 0 1 1-4.24-4.24l3.2-3.2',
-        action: () => {
-          const u = new SpeechSynthesisUtterance(selText)
-          u.lang = 'zh-CN'
-          speechSynthesis.cancel()
-          speechSynthesis.speak(u)
-        },
-      })
-    }
-
-    if (onPara) {
-      if (selText) items.push({ label: '', icon: '', action: () => {}, divider: true })
-      items.push({
-        label: '从此段开始朗读',
-        icon: 'M8 5v14l11-7z',
-        action: () => emit('play-from', idx),
-      })
-      items.push({
-        label: '复制此段文字',
-        icon: 'M9 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z',
-        action: () => {
-          const text = target?.textContent?.replace(/\s+/g, ' ').trim() || ''
-          navigator.clipboard.writeText(text)
-        },
-      })
-      items.push({
-        label: '滚动到此段',
-        icon: 'M12 5v14 M5 12l7-7 7 7',
-        action: () => target?.scrollIntoView({ behavior: 'smooth', block: 'center' }),
-      })
-    }
-
-    if (!onPara && !selText) {
-      // 右键空白区域
-      items.push({
-        label: '从头开始朗读',
-        icon: 'M8 5v14l11-7z',
-        action: () => emit('play-from', 0),
-      })
-      items.push({
-        label: '返回顶部',
-        icon: 'M12 19V5 M5 12l7-7 7 7',
-        action: () => el.scrollTo({ top: 0, behavior: 'smooth' }),
-      })
-    }
-
-    // 通用项
-    items.push({ label: '', icon: '', action: () => {}, divider: true })
+  if (selText) {
     items.push({
-      label: props.theme === 'dark' ? '切换浅色模式' : '切换深色模式',
-      icon: props.theme === 'dark'
-        ? 'M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z M12 1v3 M12 20v3 M4.22 4.22l2.12 2.12 M17.66 17.66l2.12 2.12 M1 12h3 M20 12h3'
-        : 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z',
-      action: () => emit('theme-toggle'),
+      label: '复制选中文字',
+      icon: 'M9 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z M5 7h2v14a2 2 0 0 0 2 2h6 M16 5h2a2 2 0 0 1 2 2v10',
+      action: () => navigator.clipboard.writeText(selText),
     })
-
-    contextMenuRef.value?.show(items, mx, my)
-  })
-  // 移动端长按 → 触发右键菜单
-  {
-    let touchTimer: ReturnType<typeof setTimeout> | null = null
-    let touchStartX = 0, touchStartY = 0
-    let touchMoved = false
-    el.addEventListener('touchstart', (e) => {
-      const t = e.touches[0]
-      touchStartX = t.clientX
-      touchStartY = t.clientY
-      touchMoved = false
-      touchTimer = setTimeout(() => {
-        touchTimer = null
-        if (touchMoved) return
-        // 复用 contextmenu 逻辑
-        const target = (e.target as HTMLElement).closest('[data-tts-idx]') as HTMLElement | null
-        const sel = window.getSelection()
-        const selText = sel && sel.toString().trim().length > 0 ? sel.toString().trim() : ''
-        const idx = target ? parseInt(target.getAttribute('data-tts-idx') || '0', 10) : -1
-        const onPara = idx >= 0
-        const items: MenuItem[] = []
-        if (selText) {
-          items.push({ label: '复制选中文字', icon: 'M9 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z M5 7h2v14a2 2 0 0 0 2 2h6 M16 5h2a2 2 0 0 1 2 2v10', action: () => navigator.clipboard.writeText(selText) })
-          items.push({ label: '搜索选中文字', icon: 'M11 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M21 21l-4.35-4.35', action: () => window.open(`https://www.bing.com/search?q=${encodeURIComponent(selText)}`, '_blank') })
-          items.push({ label: '朗读选中文字', icon: 'M3 3v18l9-9 M14 3v18l9-9', action: () => { const u = new SpeechSynthesisUtterance(selText); u.lang = 'zh-CN'; speechSynthesis.cancel(); speechSynthesis.speak(u) } })
-        }
-        if (onPara) {
-          if (selText) items.push({ label: '', icon: '', action: () => {}, divider: true })
-          items.push({ label: '从此段开始朗读', icon: 'M8 5v14l11-7z', action: () => emit('play-from', idx) })
-          items.push({ label: '复制此段文字', icon: 'M9 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z', action: () => { const text = target?.textContent?.replace(/\s+/g, ' ').trim() || ''; navigator.clipboard.writeText(text) } })
-        }
-        if (!onPara && !selText) {
-          items.push({ label: '从头开始朗读', icon: 'M8 5v14l11-7z', action: () => emit('play-from', 0) })
-          items.push({ label: '返回顶部', icon: 'M12 19V5 M5 12l7-7 7 7', action: () => el.scrollTo({ top: 0, behavior: 'smooth' }) })
-        }
-        items.push({ label: '', icon: '', action: () => {}, divider: true })
-        items.push({ label: props.theme === 'dark' ? '切换浅色模式' : '切换深色模式', icon: 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z', action: () => emit('theme-toggle') })
-        contextMenuRef.value?.show(items, t.clientX, t.clientY)
-      }, 500)
-    }, { passive: true })
-    el.addEventListener('touchmove', (e) => {
-      const t = e.touches[0]
-      if (Math.abs(t.clientX - touchStartX) > 10 || Math.abs(t.clientY - touchStartY) > 10) {
-        touchMoved = true
-        if (touchTimer) { clearTimeout(touchTimer); touchTimer = null }
-      }
-    }, { passive: true })
-    el.addEventListener('touchend', () => {
-      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null }
+    items.push({
+      label: '搜索选中文字',
+      icon: 'M11 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M21 21l-4.35-4.35',
+      action: () => window.open(`https://www.bing.com/search?q=${encodeURIComponent(selText)}`, '_blank'),
+    })
+    items.push({
+      label: '朗读选中文字',
+      icon: 'M3 3v18l9-9 M14 3v18l9-9',
+      action: () => {
+        const u = new SpeechSynthesisUtterance(selText)
+        u.lang = 'zh-CN'
+        speechSynthesis.cancel()
+        speechSynthesis.speak(u)
+      },
     })
   }
-  // TOC 锚点点击 → 跳章
-  el.addEventListener('click', (e) => {
-    const a = (e.target as HTMLElement).closest('a[href^="#"]') as HTMLAnchorElement | null
-    if (a) {
-      e.preventDefault()
-      const anchor = a.getAttribute('href')!.slice(1)
-      if (anchor) emit('jump', anchor)
-    }
+
+  if (onPara) {
+    if (selText) items.push({ label: '', icon: '', action: () => {}, divider: true })
+    items.push({
+      label: '从此段开始朗读',
+      icon: 'M8 5v14l11-7z',
+      action: () => emit('play-from', idx),
+    })
+    items.push({
+      label: '复制此段文字',
+      icon: 'M9 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z',
+      action: () => {
+        const text = target?.textContent?.replace(/\s+/g, ' ').trim() || ''
+        navigator.clipboard.writeText(text)
+      },
+    })
+    items.push({
+      label: '滚动到此段',
+      icon: 'M12 5v14 M5 12l7-7 7 7',
+      action: () => target?.scrollIntoView({ behavior: 'smooth', block: 'center' }),
+    })
+  }
+
+  if (!onPara && !selText) {
+    items.push({
+      label: '从头开始朗读',
+      icon: 'M8 5v14l11-7z',
+      action: () => emit('play-from', 0),
+    })
+    items.push({
+      label: '返回顶部',
+      icon: 'M12 19V5 M5 12l7-7 7 7',
+      action: () => el.scrollTo({ top: 0, behavior: 'smooth' }),
+    })
+  }
+
+  items.push({ label: '', icon: '', action: () => {}, divider: true })
+  items.push({
+    label: props.theme === 'dark' ? '切换浅色模式' : '切换深色模式',
+    icon: props.theme === 'dark'
+      ? 'M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z M12 1v3 M12 20v3 M4.22 4.22l2.12 2.12 M17.66 17.66l2.12 2.12 M1 12h3 M20 12h3'
+      : 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z',
+    action: () => emit('theme-toggle'),
   })
+
+  contextMenuRef.value?.show(items, mx, my)
+}
+
+const isTouchDevice = window.matchMedia('(pointer: coarse)').matches
+
+// 右键 → 上下文菜单（桌面）
+el.addEventListener('contextmenu', (e) => {
+  e.preventDefault()
+  const target = (e.target as HTMLElement).closest('[data-tts-idx]') as HTMLElement | null
+  buildContextMenu(target, e.clientX, e.clientY)
+})
+
+// TOC 锚点点击 → 跳章
+el.addEventListener('click', (e) => {
+  const a = (e.target as HTMLElement).closest('a[href^="#"]') as HTMLAnchorElement | null
+  if (a) {
+    e.preventDefault()
+    const anchor = a.getAttribute('href')!.slice(1)
+    if (anchor) emit('jump', anchor)
+    return
+  }
+  // 触屏设备：点击段落弹出菜单
+  if (isTouchDevice) {
+    const target = (e.target as HTMLElement).closest('[data-tts-idx]') as HTMLElement | null
+    if (target) {
+      e.preventDefault()
+      buildContextMenu(target, e.clientX, e.clientY)
+    }
+  }
+})
 }
 
 function highlight(idx: number) {

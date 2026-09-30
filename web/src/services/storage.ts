@@ -15,7 +15,7 @@ export interface ReaderPrefs {
 const DEFAULT_PREFS: ReaderPrefs = {
   rate: 1.3,
   voiceURI: 'Microsoft Xiaoxiao Online (Natural) - Chinese (Mainland)',
-  fontSize: 16,
+  fontSize: 18,
   fontFamily: 'lxgw-wenkai',
   volume: 100,
   theme: 'dark',

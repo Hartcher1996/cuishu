@@ -172,7 +172,7 @@ function onProgressClick(e: MouseEvent) {
 
       <div class="tts-control">
         <label>字号</label>
-        <input type="range" min="14" max="22" step="1" :value="fontSize" @input="onFontSizeInput" />
+        <input type="range" min="16" max="28" step="1" :value="fontSize" @input="onFontSizeInput" />
         <span class="val">{{ fontSize }}px</span>
       </div>
 
